@@ -1,0 +1,76 @@
+id,name,category,kcal_100g,protein_100g,carbs_100g,fat_100g,allergens
+1,Chicken Breast,Protein,165,31.0,0.0,3.6,None
+2,Chicken Thigh,Protein,209,26.0,0.0,10.9,None
+3,Ground Beef (85/15),Protein,215,25.9,0.0,11.8,None
+4,Ground Turkey,Protein,189,27.4,0.0,8.3,None
+5,Salmon Fillet,Protein,208,20.4,0.0,13.4,Fish
+6,Shrimp,Protein,99,24.0,0.2,0.3,Shellfish
+7,Eggs,Protein,143,12.6,0.7,9.5,Egg
+8,Firm Tofu,Protein,76,8.0,1.9,4.8,Soy
+9,Paneer Cheese,Dairy,265,18.3,1.2,20.8,Milk
+10,Chickpeas (Canned),Legumes,139,7.0,22.5,2.1,None
+11,Red Lentils,Legumes,358,24.6,63.4,1.1,None
+12,Black Beans (Canned),Legumes,132,8.9,23.7,0.5,None
+13,Basmati Rice,Grains,356,7.5,78.2,0.8,None
+14,Jasmine Rice,Grains,356,7.0,79.0,0.7,None
+15,Spaghetti Pasta,Grains,371,13.0,74.7,1.5,Wheat
+16,Penne Pasta,Grains,371,13.0,74.7,1.5,Wheat
+17,Arborio Rice,Grains,358,6.5,79.2,0.6,None
+18,Rolled Oats,Grains,389,16.9,66.3,6.9,None
+19,All-Purpose Flour,Grains,364,10.3,76.3,1.0,Wheat
+20,Pita Bread,Bakery,275,9.1,55.7,1.2,Wheat
+21,Naan Bread,Bakery,290,9.0,50.0,5.5,"Wheat,Milk"
+22,Burger Buns,Bakery,279,8.8,50.3,4.4,"Wheat,Sesame"
+23,Whole Wheat Bread,Bakery,247,13.0,41.3,3.4,Wheat
+24,Yellow Onion,Vegetables,40,1.1,9.3,0.1,None
+25,Garlic,Vegetables,149,6.4,33.1,0.5,None
+26,Fresh Ginger,Vegetables,80,1.8,17.8,0.8,None
+27,Tomatoes,Vegetables,18,0.9,3.9,0.2,None
+28,Crushed Tomatoes (Canned),Pantry,32,1.6,7.3,0.3,None
+29,Tomato Paste,Pantry,82,4.3,18.9,0.5,None
+30,Red Bell Pepper,Vegetables,31,1.0,6.0,0.3,None
+31,Green Bell Pepper,Vegetables,20,0.9,4.6,0.2,None
+32,Broccoli,Vegetables,34,2.8,6.6,0.4,None
+33,Spinach,Vegetables,23,2.9,3.6,0.4,None
+34,Zucchini,Vegetables,17,1.2,3.1,0.3,None
+35,Carrots,Vegetables,41,0.9,9.6,0.2,None
+36,Russet Potatoes,Vegetables,77,2.0,17.5,0.1,None
+37,Cucumber,Vegetables,15,0.7,3.6,0.1,None
+38,Eggplant,Vegetables,25,1.0,5.9,0.2,None
+39,Cremini Mushrooms,Vegetables,22,3.1,3.3,0.3,None
+40,Green Onions,Vegetables,32,1.8,7.3,0.2,None
+41,Fresh Cilantro,Herbs,23,2.1,3.7,0.5,None
+42,Fresh Basil,Herbs,23,3.2,2.7,0.6,None
+43,Fresh Parsley,Herbs,36,3.0,6.3,0.8,None
+44,Lemon,Produce,29,1.1,9.3,0.3,None
+45,Olive Oil,Oils,884,0.0,0.0,100.0,None
+46,Sesame Oil,Oils,884,0.0,0.0,100.0,Sesame
+47,Vegetable Oil,Oils,884,0.0,0.0,100.0,None
+48,Butter,Dairy,717,0.9,0.1,81.1,Milk
+49,Greek Yogurt,Dairy,59,10.3,3.6,0.4,Milk
+50,Heavy Cream,Dairy,340,2.8,2.7,36.1,Milk
+51,Whole Milk,Dairy,61,3.2,4.8,3.3,Milk
+52,Mozzarella Cheese,Dairy,280,28.0,3.1,17.1,Milk
+53,Parmesan Cheese,Dairy,431,38.5,4.1,28.6,Milk
+54,Cheddar Cheese,Dairy,403,24.9,1.3,33.1,Milk
+55,Feta Cheese,Dairy,264,14.2,4.1,21.3,Milk
+56,Coconut Milk (Canned),Pantry,197,2.0,2.8,21.3,Tree Nuts
+57,Soy Sauce,Condiments,53,8.1,4.9,0.6,"Soy,Wheat"
+58,Tahini,Condiments,595,17.0,21.2,53.8,Sesame
+59,Hummus,Condiments,166,7.9,14.3,9.6,Sesame
+60,Honey,Condiments,304,0.3,82.4,0.0,None
+61,Maple Syrup,Condiments,260,0.0,67.0,0.1,None
+62,Rice Vinegar,Condiments,18,0.0,0.4,0.0,None
+63,Balsamic Vinegar,Condiments,88,0.5,17.0,0.0,None
+64,Chicken Broth,Pantry,15,1.5,1.1,0.5,None
+65,Vegetable Broth,Pantry,12,0.4,2.2,0.1,None
+66,Garam Masala,Spices,379,14.3,45.2,15.1,None
+67,Ground Cumin,Spices,375,17.8,44.2,22.3,None
+68,Turmeric Powder,Spices,312,9.7,67.1,3.3,None
+69,Smoked Paprika,Spices,282,14.1,53.9,12.9,None
+70,Dried Oregano,Spices,265,9.0,68.9,4.3,None
+71,Red Pepper Flakes,Spices,318,12.0,56.6,17.3,None
+72,Cornstarch,Pantry,381,0.3,91.3,0.1,None
+73,Ketchup,Condiments,112,1.3,27.4,0.1,None
+74,Mayonnaise,Condiments,680,1.0,0.6,74.9,Egg
+75,Dijon Mustard,Condiments,66,4.4,5.3,4.0,None
