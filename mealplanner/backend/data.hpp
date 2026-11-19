@@ -53,6 +53,30 @@ inline std::vector<std::string> splitStr(const std::string& s, char d) {
 
 inline std::string lower(std::string s) { for (auto& c : s) c = tolower((unsigned char)c); return s; }
 
+// Maps a user-facing allergen label (what the UI offers: Dairy, Eggs, Gluten, Tree nuts, ...) onto the tag used in
+// ingredients.csv (milk, egg, wheat, tree nuts, ...). Returns "" when the label isn't a known allergen, in which
+// case callers fall back to matching it against ingredient/recipe names.
+inline std::string normalizeAllergen(const std::string& raw) {
+    std::string s;
+    for (char c : lower(raw)) s += (c == '-' || c == '_') ? ' ' : c;
+    size_t b = s.find_first_not_of(' '), e = s.find_last_not_of(' ');
+    if (b == std::string::npos) return "";
+    s = s.substr(b, e - b + 1);
+    static const std::map<std::string, std::string> M = {
+        {"dairy", "milk"}, {"milk", "milk"}, {"lactose", "milk"},
+        {"egg", "egg"}, {"eggs", "egg"},
+        {"gluten", "wheat"}, {"wheat", "wheat"},
+        {"soy", "soy"}, {"soya", "soy"}, {"soybean", "soy"}, {"soybeans", "soy"},
+        {"fish", "fish"}, {"seafood", "fish"},
+        {"shellfish", "shellfish"}, {"crustacean", "shellfish"}, {"crustaceans", "shellfish"},
+        {"sesame", "sesame"},
+        {"peanut", "peanut"}, {"peanuts", "peanut"},
+        {"tree nut", "tree nuts"}, {"tree nuts", "tree nuts"}, {"nuts", "tree nuts"}, {"nut", "tree nuts"},
+    };
+    auto it = M.find(s);
+    return it == M.end() ? "" : it->second;
+}
+
 struct Nutrition {
     double kcal = 0, protein = 0, carbs = 0, fat = 0;
     Nutrition& operator+=(const Nutrition& o) { kcal += o.kcal; protein += o.protein; carbs += o.carbs; fat += o.fat; return *this; }
@@ -94,7 +118,14 @@ struct Database {
             if (r.size() < 8) continue;
             Ingredient i; i.id = atoi(r[0].c_str()); i.name = r[1]; i.category = lower(r[2]);
             i.kcal = atof(r[3].c_str()); i.protein = atof(r[4].c_str()); i.carbs = atof(r[5].c_str()); i.fat = atof(r[6].c_str());
-            for (auto& a : splitStr(r[7], ';')) i.allergens.insert(lower(a));
+            // Cells hold one or more tags separated by ';' or ',' (e.g. "Wheat,Milk"); "None" means no allergens.
+            std::string cell = r[7];
+            for (auto& ch : cell) if (ch == ',') ch = ';';
+            for (auto& a : splitStr(cell, ';')) {
+                size_t b = a.find_first_not_of(' '), e = a.find_last_not_of(' ');
+                std::string t = lower(b == std::string::npos ? "" : a.substr(b, e - b + 1));
+                if (!t.empty() && t != "none") i.allergens.insert(t);
+            }
             ingredients[i.id] = i;
         }
         for (auto& r : readCsv(dir + "/stores.csv")) {
@@ -175,6 +206,13 @@ struct Database {
         }
         if (b == basePrices.end()) return false;
         out = b->second; return true;
+    }
+
+    // True if we have any price (catalog or community-reported) for this store.
+    bool hasPrices(int store) const {
+        for (auto& kv : basePrices) if (kv.first.first == store) return true;
+        for (auto& s : submissions) if (s.store == store) return true;
+        return false;
     }
 
     double medianPer100g(int ing) const {
