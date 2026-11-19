@@ -1,85 +1,84 @@
-# Plate & Save: Meal Planner
+# Meal Planner
 
-A local command-line meal planner. You enter your details and preferences, and it builds a 7-day plan (breakfast, lunch and dinner) from a set of CSV files, then works out a shopping list and which store is cheapest.
+A personalized weekly meal planning application that calculates nutritional targets, generates meal plans based on dietary constraints, and compares grocery prices across nearby stores to find the most cost effective one.
 
-Everything runs on your machine. The only data it uses is the CSV files in `data/`, and it makes no network connections or API calls.
+## Core Functionality & Calculations
 
-## How it works
+- **Nutritional Calculations:** Uses the Mifflin-St Jeor equation to calculate Basal Metabolic Rate (BMR), then applies an activity multiplier to estimate Total Daily Energy Expenditure (TDEE). Adjusts calorie and macronutrient targets based on weight goals.
+- **Weekly Meal Generation:** Generates a 7-day meal plan from a 60 recipe library, filtering by dietary preferences, allergies, disliked ingredients, and cuisine preferences. Dynamically scales portions to align with daily nutritional targets.
+- **Grocery Optimization:** Aggregates weekly ingredients, calculates required quantities, and rounds them to available package sizes.
+- **Store Price Comparison:** Compares grocery basket costs across nearby stores, ranking results by total price and distance using the Haversine formula.
+- **Price Data Collection:** Uses Playwright to retrieve Instacart product prices by intercepting GraphQL responses. Matches products to ingredients, normalizes package weights, and updates the local price dataset.
+- **Community Price Reports:** Applies median-based pricing from community submissions within a 45-day window to account for price corrections.
 
-1. **`setup`** asks for your age, sex, height, weight, activity level, weight goal, diet, allergies, dislikes, preferred cuisines, household size, budget and (optionally) your location, and saves them to `data/profile.txt`.
-2. **`plan`** calculates your daily calorie and macro targets (Mifflin–St Jeor), filters the recipes in the CSVs by your diet, allergies and dislikes, and picks 21 meals using a simulated-annealing search. It balances nutrition targets, grocery cost, variety and cuisine preferences, and scales portions to fit each meal's share of your calories. The plan is saved to `data/plan.csv`.
-3. **`grocery`** totals the ingredients across the plan, rounds up to pack sizes from `prices.csv`, and compares the cost at each store, listing the cheapest.
+## Technology Stack & Project Structure
 
-## Quick start
+| Technology | Implementation |
+|---|---|
+| C++17 | Backend HTTP server, REST API, nutrition calculations, meal generation, grocery aggregation, and store comparisons |
+| JavaScript | Frontend application logic, API communication, and interactive features |
+| HTML / CSS | Frontend structure and styling |
+| Python 3 | Instacart price scraper, data generation, and scraper testing |
+| Playwright | Browser automation and GraphQL response interception |
+| CSV | Local storage for recipes, ingredients, stores, and pricing data |
 
-Requirements: a C++17 compiler (g++ or clang++). Python 3 is only needed if you want to regenerate the sample data.
+### Project Layout
+
+```text
+backend/     C++ server, planner, data layer, JSON and HTTP helpers
+frontend/    HTML, CSS, and JavaScript single-page application
+data/        CSV datasets for recipes, ingredients, stores, and prices
+tools/       Python scraper, data generation, and tests
+run.sh       Builds and launches the application
+scrape.sh    Refreshes grocery prices and reloads the application
+```
+
+## How to Run
+
+**Requirements:** C++ compiler supporting C++17 and Python 3.
+
+Clone the repository and run:
 
 ```bash
-git clone <your-repo-url>
-cd mealplanner
-./run.sh setup      # builds, then asks for your details
-./run.sh plan       # generate a weekly plan
-./run.sh grocery    # shopping list and store comparison
+./run.sh
 ```
 
-Or build it yourself:
+The application builds and starts the backend at:
+
+`http://localhost:8080`
+
+To use a different port:
 
 ```bash
-g++ -std=c++17 -O2 src/main.cpp -o mealplanner
-# or: cmake -B build && cmake --build build
-./mealplanner setup
+./run.sh 3000
 ```
 
-Run it from the project root, or pass `--data path/to/data` to point at another folder.
+**Required after first login: scrape Instacart prices**(takes 20-30 mins to gather info and update it)
 
-## Commands
-
-| Command | What it does |
-|---|---|
-| `setup` | Enter or update your profile (press Enter to keep a current value) |
-| `plan` | Generate a new 7-day meal plan |
-| `show` | Show the last plan again |
-| `grocery` | Shopping list and store price comparison for the last plan |
-| `recipe <id>` | Ingredients, nutrition and instructions for a recipe (ids are shown in the plan) |
-
-Allergies recognized as standard tags: peanuts, tree nuts, dairy, eggs, gluten, soy, fish, shellfish and sesame. Anything else you list (allergies or dislikes) excludes any recipe with that word in its name or ingredients.
-
-## Data
-
-All data lives in CSV files in `data/`:
-
-| File | Columns |
-|---|---|
-| `ingredients.csv` | `id, name, category, kcal_100g, protein_100g, carbs_100g, fat_100g, allergens` |
-| `recipes.csv` | `id, name, meal, cuisine, minutes, servings, instructions` |
-| `recipe_ingredients.csv` | `recipe_id, ingredient_id, grams` |
-| `stores.csv` | `id, name, lat, lon, address` |
-| `prices.csv` | `store_id, ingredient_id, price, pack_g` |
-
-The bundled data is a starter set (60 recipes, 75 ingredients, 6 stores). **Prices are illustrative, not live**, and the stores are in Greenville, NC. To use your own recipes, ingredients, stores or prices, edit the CSVs, keeping the same columns. `meal` must be `Breakfast`, `Lunch` or `Dinner`, and multiple allergens in one ingredient are separated with `;`.
-
-To regenerate a fully synthetic sample set, delete the CSVs and run `python3 tools/make_seed.py`.
-
-## Project structure
-
-```
-mealplanner/
-├── src/
-│   ├── main.cpp       # Commands, prompts, profile and plan files
-│   ├── planner.hpp    # Targets, filtering, optimizer, grocery pricing
-│   └── data.hpp       # CSV loading
-├── data/              # CSV database
-├── tools/make_seed.py # Generates sample data
-├── CMakeLists.txt
-└── run.sh
+```bash
+pip install playwright
+playwright install chromium
+python3 tools/test_scraper.py
+./scrape.sh
 ```
 
-## Notes
+The application uses local CSV files for data and persistence. 
+Initial setup requires populating the datasets with an AI agent or downloaded csv:
+# ingredients.csv (csv downloadable from USDA, No AI needed for this)
+id,name,category,kcal_100g,protein_100g,carbs_100g,fat_100g,allergens
+1,Chicken Breast,Protein,165,31.0,0.0,3.6,None
 
-- Your profile and plan are plain files in `data/` (`profile.txt`, `plan.csv`). Delete them to start fresh.
-- If you enter a location, only stores within your chosen distance are compared; otherwise all stores in `stores.csv` are.
-- Calorie and nutrition figures are general estimates, not medical or dietary advice. Check the allergen data in your CSVs before relying on it.
+# recipes.csv
+id,name,meal,cuisine,minutes,servings,instructions
 
-## License
 
-Add a license of your choice (e.g. MIT) before publishing.
+# recipe_ingredients.csv
+recipe_id,ingredient_id,grams
+
+# stores.csv
+id,name,lat,lon,address
+these are preset to id 1 = Publix, id 5 = Food Lion, and id 2 = Harris Teeter for now
+
+# prices.csv(from instacart, No AI needed)
+store_id,ingredient_id,price,pack_g,source,product,scraped_at
+1,1,6.44,907,estimate,

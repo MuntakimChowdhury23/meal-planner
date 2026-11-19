@@ -1,5 +1,5 @@
 """Generates SAMPLE seed CSVs into ../data. Prices/stores are illustrative, not real.
-Replace the CSVs with your own data (same column layout) to use your own recipes and prices."""
+Replace the CSVs with your own imported databases (same column layout) and POST /api/reload."""
 import csv, hashlib, os
 
 OUT = os.path.join(os.path.dirname(__file__), "..", "data")

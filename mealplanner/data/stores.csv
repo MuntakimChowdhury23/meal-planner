@@ -1,7 +1,4 @@
 id,name,lat,lon,address
-1,Publix Super Market at Greenville Square,35.5881,-77.3676,"705 Greenville Blvd SE, Greenville, NC 27858"
-2,Harris Teeter (University Commons),35.5812,-77.3768,"3040 Evans St, Greenville, NC 27834"
-3,Trader Joe's,35.5795,-77.3772,"3160 B Evans St, Greenville, NC 27834"
-4,Lidl,35.5668,-77.3489,"1800 E Fire Tower Rd, Greenville, NC 27858"
-5,Food Lion (E 10th St),35.5964,-77.3358,"3136 E 10th St, Greenville, NC 27834"
-6,Walmart Supercenter,35.5865,-77.3948,"210 Greenville Blvd SW, Greenville, NC 27834"
+1,Publix,35.5768,-77.382,"705 Greenville Blvd SE, Greenville, NC 27858"
+2,Harris Teeter,35.5653,-77.3865,"3040 Evans St, Greenville, NC 27834"
+5,Food Lion,35.5891,-77.3672,"2440 S Charles Blvd, Greenville, NC 27858"

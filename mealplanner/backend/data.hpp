@@ -1,6 +1,7 @@
 #pragma once
 #include <algorithm>
 #include <cmath>
+#include <ctime>
 #include <fstream>
 #include <iostream>
 #include <map>
@@ -36,6 +37,13 @@ inline std::vector<Row> readCsv(const std::string& path) {
     return rows;
 }
 
+inline std::string csvEscape(const std::string& s) {
+    if (s.find_first_of(",\"\n") == std::string::npos) return s;
+    std::string r = "\"";
+    for (char c : s) { if (c == '"') r += '"'; r += c; }
+    return r + "\"";
+}
+
 inline std::vector<std::string> splitStr(const std::string& s, char d) {
     std::vector<std::string> r; std::string cur;
     for (char c : s) { if (c == d) { if (!cur.empty()) r.push_back(cur); cur.clear(); } else cur += c; }
@@ -66,14 +74,18 @@ struct Recipe {
     bool vegan = true, vegetarian = true, pescatarian = true;
 };
 struct Store { int id = 0; std::string name, address; double lat = 0, lon = 0; };
-struct Price { double price = 0, packG = 0; };
+struct Price { double price = 0, packG = 0; int reports = 0; bool community = false; long updated = 0; };
+struct Submission { int store, ing; double price, packG; std::string user; long ts; };
 
 struct Database {
     std::map<int, Ingredient> ingredients;
     std::map<int, Recipe> recipes;
     std::map<int, Store> stores;
     std::map<std::pair<int, int>, Price> basePrices;
+    std::vector<Submission> submissions;
     std::string dir;
+
+    static long now() { return (long)time(nullptr); }
 
     bool load(const std::string& d) {
         dir = d;
@@ -108,6 +120,7 @@ struct Database {
             it->second.items.push_back({atoi(r[1].c_str()), atof(r[2].c_str())});
         }
         for (auto& kv : recipes) derive(kv.second);
+        loadSubmissions();
         return !recipes.empty();
     }
 
@@ -126,10 +139,50 @@ struct Database {
         r.perServing = total.scaled(1.0 / r.servings);
     }
 
-    bool priceFor(int store, int ing, Price& out) const {
+    void loadSubmissions() {
+        submissions.clear();
+        for (auto& r : readCsv(dir + "/community_prices.csv")) {
+            if (r.size() < 6) continue;
+            submissions.push_back({atoi(r[0].c_str()), atoi(r[1].c_str()), atof(r[2].c_str()), atof(r[3].c_str()), r[4], atol(r[5].c_str())});
+        }
+    }
+    void appendSubmission(const Submission& s) {
+        submissions.push_back(s);
+        std::string path = dir + "/community_prices.csv";
+        bool fresh = !std::ifstream(path).good();
+        std::ofstream f(path, std::ios::app);
+        if (fresh) f << "store_id,ingredient_id,price,pack_g,user,timestamp\n";
+        f << s.store << "," << s.ing << "," << s.price << "," << s.packG << "," << csvEscape(s.user) << "," << s.ts << "\n";
+    }
+
+    bool effective(int store, int ing, Price& out) const {
         auto b = basePrices.find({store, ing});
+        std::vector<const Submission*> recent;
+        long cutoff = now() - 45L * 86400;
+        for (auto& s : submissions) if (s.store == store && s.ing == ing && s.ts >= cutoff) recent.push_back(&s);
+        if (!recent.empty()) {
+            std::sort(recent.begin(), recent.end(), [](auto* a, auto* c) { return a->ts > c->ts; });
+            if (recent.size() > 5) recent.resize(5);
+            std::vector<double> pp;
+            for (auto* s : recent) pp.push_back(s->price / (s->packG > 0 ? s->packG : 1) * 100.0);
+            std::sort(pp.begin(), pp.end());
+            double med = pp[pp.size() / 2];
+            double pack = recent[0]->packG > 0 ? recent[0]->packG : (b != basePrices.end() ? b->second.packG : 0);
+            if (pack <= 0) return false;
+            out.packG = pack; out.price = std::round(med * pack / 100.0 * 100) / 100; out.reports = (int)recent.size();
+            out.community = true; out.updated = recent[0]->ts;
+            return true;
+        }
         if (b == basePrices.end()) return false;
         out = b->second; return true;
+    }
+
+    double medianPer100g(int ing) const {
+        std::vector<double> v;
+        for (auto& kv : basePrices) if (kv.first.second == ing) v.push_back(kv.second.price / kv.second.packG * 100.0);
+        if (v.empty()) return 0;
+        std::sort(v.begin(), v.end());
+        return v[v.size() / 2];
     }
 };
 
